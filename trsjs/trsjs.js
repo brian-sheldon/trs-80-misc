@@ -1,7 +1,7 @@
 
 function log( s, lf = '\n' ) {
   let c = $('#log').html();
- $('#log').html( s + lf + c );
+  $('#log').html( s + lf + c );
 }
 
 function start() {
