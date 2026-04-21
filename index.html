@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <link type="text/css" rel="stylesheet" href="trsjs/trsjs.css">
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script type="text/javascript" src="trsjs/trsemu-1.6.js"></script>
+    <script type="text/javascript" src="trsjs/trsjs.js"></script>
+  <head>
+  <body onload="start()"> 
+    <div id="scrn">
+      <canvas width="512" height="408" style="background:black"></canvas>
+    </div><br>
+    <div id="graph">
+      <canvas width="512" height="100" style="background:black"></canvas>
+    </div><br>
+    <input type="button"id="btn" value="Run" onClick="trsEmu.run('toggle');">
+    <input type="button" value="Reset" onClick="trsEmu.run('reset');">
+    <input type="button" value="log" onClick="$('#log').toggle()">
+    <div id="log"></div>
+  <body>
+<html>
