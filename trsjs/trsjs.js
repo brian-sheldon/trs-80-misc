@@ -1,5 +1,5 @@
 
-function log( s, lf = '\n' ) {
+function log( s, lf = '<br>' ) {
   let c = $('#log').html();
   $('#log').html( s + lf + c );
 }
