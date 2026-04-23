@@ -5,10 +5,7 @@
 class Altair {
   constructor( div ) {
     log( 'Altair constructor begins ...' );
-    this.div = div;
-    this.canvas = document.getElementById( div ).children[0];
-    this.width = this.canvas.width;
-    this.height = this.canvas.height;
+    this.createCanvas( div );
     this.ctx = this.canvas.getContext( '2d' );
     this.clear( '#000000' );
     this.panelWidth = 19.5;
@@ -32,6 +29,17 @@ class Altair {
     //log( on );
     this.leds[label].on = on;
     this.led( label, on );
+  }
+  createCanvas( divid, width = 800, height = 370 ) {
+    log( 'createCanvas ...' );
+    let div = document.getElementById( divid );
+    this.canvas = document.createElement( 'canvas' );
+    this.canvas.id = div + '-canvas';
+    this.canvas.width = width;
+    this.canvas.height = height;
+    this.width = width;
+    this.height = height;
+    div.appendChild( this.canvas );
   }
   initPanel() {
     this.address = [
@@ -86,19 +94,19 @@ class Altair {
         '2','1','0'
       ],
       [
-        'off',
+        'off,on',
         1,1,1,1,
-        'stop',
+        'stop,run',
         1,
-        'step',
+        'single step',
         1,
-        'examine',
+        'examine,examine next',
         1,
-        'deposit',
+        'deposit,deposit next',
         1,
-        'reset',
+        'reset,clr',
         1,
-        'protect',
+        'protect,unprotect',
         1,
         'aux',
         1,
@@ -144,18 +152,18 @@ class Altair {
   }
   config() {
     // horizontal
-    this.left = 3;
+    this.left = 2;
     this.hcenter = 22.5;
     this.right = 3;
     this.hgap =  this.width / ( this.left + this.hcenter + this.right );
     this.leftMargin =  this.left * this.hgap;
     this.ratio = this.hgap / 28.07017543859649;
     // vertical
-    this.top = 50;
+    this.top = 1;
     this.vcenter = 0;
     this.bottom = 0;
-    this.vgap = 60;
-    this.topMargin = 50;
+    this.vgap = 60 * this.ratio;
+    this.topMargin = this.top * this.vgap;
     // background
     this.backgroundColor = '#000000';
     // led
@@ -194,7 +202,7 @@ class Altair {
     let led = this.leds[label];
     let x = led.x * this.hgap + this.leftMargin;
     let y = led.y * this.vgap + this.topMargin;
-    this.text( label, x, y - 11, this.textColor );
+    this.label( label, x, y - 11 );
     this.circle( x, y, r, color );
     if ( this.address.includes( label ) || this.data.includes( label ) ) {
       this.vlines( x, y );
@@ -296,7 +304,30 @@ class Altair {
     this.ctx.fillStyle = color;
     this.ctx.fillRect( 0, 0, this.width, this.height );
   }
-  text( txt, x, y, color, align = 'center' ) {
+  label( txt, x, y ) {
+    let t = '', b = '';
+    let t1 = '', t2 = '', b1 = '', b2 = '';
+    if ( txt.includes( ',' ) ) {
+      [ t, b ] = txt.split( ',' );
+    } else {
+      t = txt;
+    }
+    if ( t.includes( ' ' ) ) {
+      [ t1, t2 ] = t.split( ' ' );
+    } else {
+      t2 = t;
+    }
+    if ( b.includes( ' ' ) ) {
+      [ b1, b2 ] = b.split( ' ' );
+    } else {
+      b1 = b;
+    }
+    if ( t1 != '' ) this.text( t1, x, y - 10 * this.ratio );
+    if ( t2 != '' ) this.text( t2, x, y );
+    if ( b1 != '' ) this.text( b1, x, y + 28 * this.ratio );
+    if ( b2 != '' ) this.text( b2, x, y + 38 * this.ratio );
+  }
+  text( txt, x, y, color = this.textColor, align = 'center' ) {
     this.ctx.font = this.font;
     this.ctx.fillStyle = color;
     this.ctx.textAlign = align;
