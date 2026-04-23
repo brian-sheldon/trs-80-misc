@@ -14,7 +14,24 @@ class Altair {
     this.panelWidth = 19.5;
     this.config();
     this.initPanel();
+    this.test();
     log( 'Altair constructor ends ...' );
+  }
+  test() {
+    let self = this;
+    setInterval( function() {
+      for ( let i = 0; i < 10; i++ ) {
+        let rnd = Math.floor( Math.random() * self.ledsIndex.length );
+        let label = self.ledsIndex[rnd];
+        self.toggle( label );
+      }
+    }, 200 );
+  }
+  toggle( label ) {
+    let on = ! this.leds[label].on;
+    //log( on );
+    this.leds[label].on = on;
+    this.led( label, on );
   }
   initPanel() {
     this.address = [
@@ -91,12 +108,16 @@ class Altair {
     let x = 0;
     let y = 0;
     this.leds = {};
+    this.ledsIndex = [];
     for ( let r = 0; r < this.ledRows.length; r++ ) {
       let row = this.ledRows[r];
       for ( let c = 0; c < row.length; c++ ) {
         //log( x );
         let label = row[c];
         if ( typeof( label ) == 'string' ) {
+          if ( r < 2 ) {
+            this.ledsIndex.push( label );
+          }
           this.leds[label] = {};
           this.leds[label].row = r;
           this.leds[label].col = c;
@@ -106,9 +127,9 @@ class Altair {
           this.leds[label].yabs = this.topMargin + y * this.vgap;
           this.leds[label].on = false;
           if ( r < 2 ) {
-            this.led( label, this.ledRadius, '#800000' );
+            this.ledInit( label, this.ledRadius, '#800000' );
           } else {
-            this.led( label, this.switchRadius, '#888888' );
+            this.ledInit( label, this.switchRadius, '#888888' );
           }
           x = x + 1;
         } else {
@@ -134,12 +155,12 @@ class Altair {
     this.vcenter = 0;
     this.bottom = 0;
     this.vgap = 60;
-    this.topMargin = 60;
+    this.topMargin = 50;
     // background
     this.backgroundColor = '#000000';
     // led
     this.ledRadius = 8 * this.ratio;
-    this.ledColorOn = '#880000';
+    this.ledColorOn = '#ff0000';
     this.ledColorOff = '#800000';
     // switch
     this.switchRadius = 9 * this.ratio;
@@ -157,11 +178,22 @@ class Altair {
     this.vlineInc = 10 * this.ratio;
     this.vlineLen = 5 * this.ratio;
   }
-  led( label, r, color, on = false ) {
+  led( label, on = false ) {
+    this.leds[label].on = on;
     let led = this.leds[label];
-    led.on = on;
+    let x = led.xabs;
+    let y = led.yabs;
+    let r = this.ledRadius;
+    let color = this.ledColorOff;
+    if ( on ) {
+      color = this.ledColorOn;
+    }
+    this.circle( x, y, r, color );
+  }
+  ledInit( label, r, color ) {
+    let led = this.leds[label];
     let x = led.x * this.hgap + this.leftMargin;
-    let y = led.y * 60 + 50;
+    let y = led.y * this.vgap + this.topMargin;
     this.text( label, x, y - 11, this.textColor );
     this.circle( x, y, r, color );
     if ( this.address.includes( label ) || this.data.includes( label ) ) {
@@ -180,15 +212,15 @@ class Altair {
   }
   hlines() {
     let xoffset = 11 * this.ratio;
-    let yoffset = 3 * this.ratio;
-    let yoffset2 = 7 * this.ratio;
+    let yoffset = 12 * this.ratio;
+    let yoffset2 = 16 * this.ratio;
     let x0, x1, x2, x3, y0, y1, x, y;
     x0 = this.leds['memr'].xabs - xoffset;
     x1 = this.leds['int'].xabs + xoffset;
     y = this.leds['memr'].yabs + yoffset;
     this.line( x0, y, x1, y, 1, 'white' );
     x = this.leds['out'].xabs + this.hgap / 2 * this.ratio;
-    y = this.leds['memr'].yabs + 15 * this.ratio;
+    y = this.leds['memr'].yabs + yoffset + 12 * this.ratio;
     this.text( 'status', x, y, this.textColor );
     //
     x0 = this.leds['15'].xabs - xoffset;
@@ -196,7 +228,7 @@ class Altair {
     x2 = this.leds['15'].xabs - 23 * this.ratio;
     x3 = this.leds['15'].xabs - 45 * this.ratio;
     y0 = this.leds['15'].yabs + yoffset;
-    y1 = this.leds['15'].yabs - 18 * this.ratio;
+    y1 = this.leds['15'].yabs + yoffset - 21 * this.ratio;
     this.line( x0, y0, x1, y1, 1, 'white' );
     this.line( x1, y1, x2, y1, 1, 'white' );
     this.text( 'sense sw.', x3, y1, this.textColor );
@@ -255,9 +287,9 @@ class Altair {
     y1 = y0;
     this.line( x0, y0, x1, y1, 1, 'white' );
     x = this.leds['0'].xabs + 20 * this.ratio;
-    y = this.leds['0'].yabs - 5 * this.ratio;
+    y = this.leds['0'].yabs + yoffset - 8 * this.ratio;
     this.text( 'Data', x, y, this.textColor, 'left' );
-    y = this.leds['0'].yabs + 15 * this.ratio;
+    y = this.leds['0'].yabs + yoffset + 12 * this.ratio;
     this.text( 'Address', x, y, this.textColor, 'left' );
   }
   clear( color ) {
