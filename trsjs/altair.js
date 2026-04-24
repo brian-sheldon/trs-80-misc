@@ -68,8 +68,11 @@ class Altair {
           dir = 0;
         }
       }
+      x = x - self.leftMargin + self.hgap * 0.6;
+      //log( x + ' : ' + y );
+      let col = Math.floor( x / self.hgap );
       if ( row != -1 ) {
-        log( 'click row: ' + row + ' dir: ' + dir );
+        log( 'click row: ' + row + ' col: ' + col + ' dir: ' + dir );
       }
     });
   }
@@ -196,7 +199,7 @@ class Altair {
           if ( r < 2 ) {
             this.ledInit( t2, this.ledRadius, '#800000' );
           } else {
-            this.ledInit( t2, this.switchRadius, '#888888' );
+            this.switchInit( t2, this.switchRadius, '#888888' );
           }
           x = x + 1;
         } else {
@@ -270,6 +273,54 @@ class Altair {
     if ( this.address.includes( label ) || this.data.includes( label ) ) {
       this.vlines( x, y );
     }
+  }
+  isAllDigits( s ) {
+    return /^\d+$/.test( s );
+  }
+  switchState( label, state = -1 ) {
+    let swChars = [
+      'V','\u22c0', 'o','\u028c','\u22c0','v','V','','',''
+    ];
+    let onoff = false;
+    let states = 3;
+    if ( state == -1 ) {
+      state = 2;
+      states = 2;
+      if ( label == 'off' || this.isAllDigits( label ) ) {
+        onoff = true;
+        state = Math.floor( Math.random() * 2 );
+      }
+      this.leds[label].states = states;
+    }
+    this.leds[label].state = state;
+    let sw = this.leds[label];
+    let x = sw.x * this.hgap + this.leftMargin;
+    let y = sw.y * this.vgap + this.topMargin;
+    this.circle( x, y, this.switchRadius, this.switchColor0 );
+    let ch = 2;
+    switch ( state ) {
+      case 0:
+        ch = swChars[0];
+        y = y + 7 * this.ratio;
+        break;
+      case 1:
+        ch = swChars[1];
+        y = y - 1 * this.ratio;
+        break;
+      case 2:
+        ch = swChars[2];
+        y = y + 2 * this.ratio;
+        break;
+    }
+    this.text( ch, x, y );
+  }
+  switchInit( label, r, color ) {
+    let sw = this.leds[label];
+    let x = sw.x * this.hgap + this.leftMargin;
+    let y = sw.y * this.vgap + this.topMargin;
+    this.label( label, x, y - 11 );
+    this.circle( x, y, r, color );
+    this.switchState( label );
   }
   vlines( x, y ) {
     let beg = this.vlineBeg;
