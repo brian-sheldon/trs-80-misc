@@ -9,6 +9,9 @@ CPPFLAGS = -Wall -Wextra -02 -g
 
 all: z80_test spectrum_test cpm_test cpmcon cpm_debug zxsdl
 
+dis: dis.cpp
+	$(CPP) $(CFLAGS) -o dis dis.cpp z80.dis.h $(LDFLAGS)
+
 cli: cli.cpp
 	$(CPP) $(CFLAGS) -o cli cli.cpp $(LDFLAGS)
 
